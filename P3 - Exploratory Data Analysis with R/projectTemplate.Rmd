@@ -28,11 +28,11 @@ wines$score <- ordered(wines$quality, levels = c(1:9))
 
 ```
 
-In this project I wanted to explore how wine quality of a white wines dataset is influenced by chemical measurements of the wine. I'll explore the dataset looking for the features that have the highest impact on wine quality and I'll try to find a linear model that given a set of wine features can predict the wine quality.
+In this project I wanted to explore how wine quality of a white wines dataset is influenced by chemical measurements of the wine. I explored the dataset looking for the features that have the highest impact on wine quality and I tried to find a linear model that can predict the wine quality, given a set of wine features.
 
 # Univariate Plots Section
 
-To begin I wanted to explore the dataset features summary
+To begin, I wanted to explore the dataset features summary.
 
 ```{r echo=FALSE, Univariate_Plots}
 
@@ -57,7 +57,7 @@ summary(wines)
 
 ```
 
-I noticed that all variables are numeric and that quality variable could be transformed to an ordered factor, so I added a new variable called score (this code has been moved at the biginning of the file) in order to have both quality and score variable for each observation. 
+I noticed that all variables are numeric and that quality variable could be transformed to an ordered factor, so I added a new variable called "score" (this code has been moved at the beginning of the file) in order to have both quality and score variable for each observation. 
 The summary function gave me a sense of the variables distribution, but I'm going to explore all the variables by plotting their distributions:
 
 ```{r echo=FALSE}
@@ -136,7 +136,6 @@ The main features I was interested in were quality and alcohol.
 ### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
 
 All the features are interesting. I suppose that wines with low acidity, chlorides and sulphates will score better than other wines.
-The distributions above does
 
 ### Did you create any new variables from existing variables in the dataset?
 
@@ -145,12 +144,12 @@ I wanted to keep both quality and score as "int" and "ordered factor" variables 
 
 ### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
 
-The alcohol distribution was unusual, it was not gaussian. The dataset was already in tity format and I did not have to make adjustments.
+The alcohol distribution was unusual, it was not gaussian. The dataset was already in tidy format and I did not have to make adjustments.
 As described above, I transformed the "quality" integer variable into an ordinated factor called "score".
 
 # Bivariate Plots Section
 
-I'll start by exploring the ggpairs matrix on a sample of 1000 observations on the dataset.
+I started by exploring the ggpairs matrix on a sample of 1000 observations on the dataset.
 I renamed the dataset features in order to make the plot more readable, but I was unable to suppress warnings and resize the correlation font size. I printed the correlation summary after the plot.
 
 ```{r echo=FALSE, warning=FALSE, Bivariate_Plots}
@@ -189,7 +188,8 @@ renamed_wines_subset <- rename(wines_subset, c(
   "score" = "score"))
 
 set.seed(1836)
-renamed_wines_sample = renamed_wines_subset[sample.int(nrow(wines_subset), 1000),]
+renamed_wines_sample = 
+  renamed_wines_subset[sample.int(nrow(wines_subset), 1000),]
 
 ggpairs(
   renamed_wines_sample, 
@@ -245,7 +245,7 @@ ggpairs(
 
 =======================================================================
 
-There is a high correlation between density and residual sugar (0.839), I'm courious to see in detail this scatter plot. I filtered the results to exclude outliers and added an alpha to avoid overlplotting.
+There is a high correlation between density and residual sugar (0.839), I am curious to see in detail this scatter plot. I filtered the results to exclude outliers and added an alpha to avoid overlplotting.
 
 ```{r echo=FALSE, warning=FALSE}
 
@@ -360,6 +360,7 @@ ggpairs(
 ```
 
 ========================================================
+
 Let's have a closer look to alcohol by density and alcohol by residual sugar, colored by quality score 
 
 ```{r echo=FALSE, warning=FALSE}
@@ -430,7 +431,7 @@ ggplot(data = subset(wines, quality != 6),
 
 ```
 
-By coloring the scatter plot by quality, we can notice that better wines have higher residual sugar for the same density values.
+We can notice that better wines have higher residual sugar for the same density values.
 
 ===================================================================
 
@@ -466,7 +467,7 @@ Wines with score 5 or lower are more concentrated on lower alcohol percentage.
 
 ### Linear models
 
-Let's create a linear model to see if we can predict quality based on the main correlated features.
+I created a linear model to see if we can predict quality based on the main correlated features.
 
 ```{r echo=FALSE, warning=FALSE}
 # Linear models for quality prediction
@@ -497,7 +498,7 @@ Infact this model is much better. Alcohol concentration and residual sugar are t
 
 ### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
 
-Yes, in general wines with lower density tend to have higher quality, while residual sugar does not seem to have a clear impact on the quality. Combining residual sugar and density, we can see that for a given density, wines with higher residual sugar have higher quality.
+Yes, in general wines with lower density tend to have higher quality (correlation -0.307), while residual sugar does not seem to have a clear impact on the quality (correlation -0.097). Combining residual sugar and density, we can see that for a given density, wines with higher residual sugar have higher quality.
 
 ### Were there any interesting or surprising interactions between features?
 
@@ -534,7 +535,7 @@ wines_5_6_7_count / all_wines_count
 
 ### Description One
 
-The first plot shows the quality distribution of the wines in the dataset. The dataset contains wines which scored from 3 to 9 in a distribution close to binobial. Tehre are very few wines scoring 9 and 3 quality points, while the vast majority of the wines (92.5 %) are scoring 5, 6 and 7 points.
+The first plot shows the quality distribution of the wines in the dataset. The dataset contains wines which scored from 3 to 9 in a distribution close to binobial. There are very few wines scoring 9 and 3 quality points, while the wide majority of the wines (92.5 %) are scoring 5, 6 and 7 points.
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
@@ -588,7 +589,7 @@ The plot shows how very good wines are more concetrated over the regression line
 
 The dataset was tidy and clean, so I had the chance to dig directly into the analysis. The ggpairs plot was very useful in spotting the possible variable correlation and gave me several insights. I had some struggles in finding the ggpairs documentation and in formatting it for the kint file.
 
-Some data that would be interesting to analyse would be for sure the geographical position (and height above the sea) and production year. I think that this features can have a significant factor in determinating the wine quality because altitude and weather can have an impact on the sugar quantity before fermentation, so would lead to a higher final alcohol volume and residual sugar.
+Geographical position (and height above the sea) and year of wine production would be interesting to analyse. I think that this features can have a significant factor in determinating the wine quality because altitude and weather can have an impact on the sugar quantity before fermentation, so they would lead to a higher final alcohol volume and residual sugar.
 
 The wines dataset shows that the wine quality appreciated by the humans is far more complex than the objective parameters of the wine chemical composition observed in the data set. It is not possible to judge the wine quality on these parameters alone, but there are some features that do have an impact on the perceived quality of the wine.
 In general we tend to prefer wines with high alcohol concentration percentage, while factors like chlorides, volatile acidity and total sulfur dioxide have a bad impact on wine taste.
