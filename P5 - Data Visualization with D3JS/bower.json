@@ -1,0 +1,21 @@
+{
+  "name": "P5 - Data Visualization with D3JS",
+  "version": "0.0.0",
+  "homepage": "https://github.com/edurdevic/DataScienceNanodegree",
+  "authors": [
+    "Erni Durdevic <erni.durdevic@gmail.com>"
+  ],
+  "description": "Data visualization exercises",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5"
+  }
+}
