@@ -25,7 +25,7 @@ function buildCalorimeterCharts (error, responseData) {
     var y = d3.scale.linear()
         .range([height, 0]);
 
-    var colors:any = ["red", "white", "green"];
+    var colors:any = ["blue", "white", "red"];
 
     var color = d3.scale.linear()
         .domain(d3.extent(data, (d) => { return d.temp_delta; }))

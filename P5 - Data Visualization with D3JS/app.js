@@ -13,7 +13,7 @@ function buildCalorimeterCharts(error, responseData) {
         .range([0, 100]);
     var y = d3.scale.linear()
         .range([height, 0]);
-    var colors = ["red", "white", "green"];
+    var colors = ["blue", "white", "red"];
     var color = d3.scale.linear()
         .domain(d3.extent(data, function (d) { return d.temp_delta; }))
         .range(colors);
