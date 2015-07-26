@@ -1,0 +1,7 @@
+{
+    "name": "Data visualizations",
+    "main": "./app.js",
+    "typescript": {
+        "definition": "awesome.d.ts"
+    }
+}
