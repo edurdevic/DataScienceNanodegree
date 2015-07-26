@@ -19,8 +19,17 @@ function buildCalorimeterCharts (error, responseData) {
     var x = d3.time.scale()
         .range([0, width]);
 
+    var xGradient = d3.time.scale()
+           .range([0, 100]);
+
     var y = d3.scale.linear()
         .range([height, 0]);
+
+    var colors:any = ["red", "white", "green"];
+
+    var color = d3.scale.linear()
+        .domain(d3.extent(data, (d) => { return d.temp_delta; }))
+        .range(colors);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -45,28 +54,44 @@ function buildCalorimeterCharts (error, responseData) {
     if (error) throw error;
 
 
+    xGradient.domain(d3.extent<any>(data, (d) => { return d.date; }));
     x.domain(d3.extent<any>(data, (d) => { return d.date; }));
     y.domain([0, d3.max(data, function(d) { return d.temp_i; })]);
 
-       svg.append("path")
-           .datum(data)
-           .attr("class", "area")
-           .attr("d", area);
+    svg.append("linearGradient")
+      .attr("id", "temperature-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", 0).attr("y1", 0)
+      .attr("x2", width).attr("y2", 0)
+    .selectAll("stop")
+      .data(data)
+    .enter().append("stop")
+      .attr("offset", function(d) { return xGradient(d.date) + "%"; })
+      .attr("stop-color", function(d) { return color(d.temp_delta); });
 
-       svg.append("g")
-           .attr("class", "x axis")
-           .attr("transform", "translate(0," + height + ")")
-           .call(xAxis);
+    // Area
+    svg.append("path")
+        .datum(data)
+        .attr("class", "area")
+        .attr("d", area)
+        .style("fill", "url(#temperature-gradient)");
 
-       svg.append("g")
-           .attr("class", "y axis")
-           .call(yAxis)
-         .append("text")
-           .attr("transform", "rotate(-90)")
-           .attr("y", 6)
-           .attr("dy", ".71em")
-           .style("text-anchor", "end")
-           .text("Temperature");
+    // X axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Y axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Temperature");
 }
 
 
@@ -78,10 +103,12 @@ class CalorimeterData {
       this.temp_i = +row["temp-i_C"];
       this.temp_o = +row["temp-o_C"];
       this.flowrate = +row["flowrate_lm"];
+      this.temp_delta = this.temp_o - this.temp_i;
    }
 
    date: Date;
    temp_i: number;
    temp_o: number;
+   temp_delta: number;
    flowrate: number;
 }
