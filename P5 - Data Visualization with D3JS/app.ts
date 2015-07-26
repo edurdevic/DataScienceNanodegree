@@ -1,9 +1,19 @@
-d3.tsv<CalorimeterData>("data/sensor1.tsv", (d):CalorimeterData => { return new CalorimeterData(d); }, buildCalorimeterCharts);
+//d3.tsv<CalorimeterData>("data/sensor1.tsv", (d):CalorimeterData => { return new CalorimeterData(d); }, buildCalorimeterCharts);
 
-function buildCalorimeterCharts (error, data:CalorimeterData[]) {
+d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterCharts);
+
+
+function buildCalorimeterCharts (error, responseData) {
    var margin = {top: 20, right: 20, bottom: 30, left: 50},
        width = 960 - margin.left - margin.right,
        height = 500 - margin.top - margin.bottom;
+
+   var data:CalorimeterData[] = [];
+
+   for (var i in responseData.content) {
+      var item = responseData.content[i];
+      data.push(new CalorimeterData(item, i));
+   }
 
 
     var x = d3.time.scale()
@@ -59,14 +69,15 @@ function buildCalorimeterCharts (error, data:CalorimeterData[]) {
            .text("Temperature");
 }
 
+
 class CalorimeterData {
-   constructor(row: { [key: string]: string }){
+   constructor(row: { [key: string]: string }, dateString: string){
       var parseDate = d3.time.format.iso.parse;
 
-      this.date = parseDate(row["date"]);
-      this.temp_i = +row["temp_i"];
-      this.temp_o = +row["temp_o"];
-      this.flowrate = +row["flowrate"];
+      this.date = parseDate(dateString);
+      this.temp_i = +row["temp-i_C"];
+      this.temp_o = +row["temp-o_C"];
+      this.flowrate = +row["flowrate_lm"];
    }
 
    date: Date;
