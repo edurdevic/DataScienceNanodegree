@@ -25,10 +25,21 @@ function buildCalorimeterCharts (error, responseData) {
     var y = d3.scale.linear()
         .range([height, 0]);
 
-    var colors:any = ["blue", "white", "red"];
 
+    //var minDeltaT: number = d3.min(data, (d) => { return d.temp_delta; }); //Celsius
+    //var maxDeltaT: number = d3.max(data, (d) => { return d.temp_delta; });
+
+    var minThermicPower: number = d3.min(data, CalorimeterData.getThermicPower);
+    var maxThermicPower: number = d3.max(data, CalorimeterData.getThermicPower);
+
+    var colorSpanExtension: number = Math.max(Math.abs(minThermicPower), Math.abs(maxThermicPower));
+
+
+
+                   // EarthBlue   white    LoveRed
+    var colors:any = ["#0000A0", "white", "#E42217"];
     var color = d3.scale.linear()
-        .domain(d3.extent(data, (d) => { return d.temp_delta; }))
+        .domain([-colorSpanExtension, 0 , colorSpanExtension])
         .range(colors);
 
     var xAxis = d3.svg.axis()
@@ -45,7 +56,7 @@ function buildCalorimeterCharts (error, responseData) {
         .y1((d) => { return y(d.temp_i); });
 
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(".chart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -67,9 +78,9 @@ function buildCalorimeterCharts (error, responseData) {
       .data(data)
     .enter().append("stop")
       .attr("offset", function(d) { return xGradient(d.date) + "%"; })
-      .attr("stop-color", function(d) { return color(d.temp_delta); });
+      .attr("stop-color", function(d) { return color(CalorimeterData.getThermicPower(d)); });
 
-    // Area
+    // Area with gradient fill
     svg.append("path")
         .datum(data)
         .attr("class", "area")
@@ -80,7 +91,13 @@ function buildCalorimeterCharts (error, responseData) {
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .append("text")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Time");;
 
     // Y axis
     svg.append("g")
@@ -94,6 +111,9 @@ function buildCalorimeterCharts (error, responseData) {
         .text("Temperature");
 }
 
+class Constants {
+   public static waterSpecificHeat: number = 4.186; // [J/(g*C)]
+}
 
 class CalorimeterData {
    constructor(row: { [key: string]: string }, dateString: string){
@@ -102,13 +122,18 @@ class CalorimeterData {
       this.date = parseDate(dateString);
       this.temp_i = +row["temp-i_C"];
       this.temp_o = +row["temp-o_C"];
-      this.flowrate = +row["flowrate_lm"];
+      this.flowrate = +row["flowrate_lm"] / 60 / 1000; //conversion from l/min to m3/s
       this.temp_delta = this.temp_o - this.temp_i;
    }
 
+   public static getThermicPower(d: CalorimeterData): number {
+      //        [C]       *  [m3/s]    *        [J/(g*C)]            * [m3 -> g] =  [J*s] = [W]
+      return d.temp_delta * d.flowrate * Constants.waterSpecificHeat * 1000000;   // [W]
+   }
+
    date: Date;
-   temp_i: number;
-   temp_o: number;
-   temp_delta: number;
-   flowrate: number;
+   temp_i: number;      // [C]
+   temp_o: number;      // [C]
+   temp_delta: number;  // [C]
+   flowrate: number;    // [m3/s]
 }

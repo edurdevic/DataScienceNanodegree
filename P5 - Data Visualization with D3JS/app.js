@@ -13,9 +13,12 @@ function buildCalorimeterCharts(error, responseData) {
         .range([0, 100]);
     var y = d3.scale.linear()
         .range([height, 0]);
-    var colors = ["blue", "white", "red"];
+    var minThermicPower = d3.min(data, CalorimeterData.getThermicPower);
+    var maxThermicPower = d3.max(data, CalorimeterData.getThermicPower);
+    var colorSpanExtension = Math.max(Math.abs(minThermicPower), Math.abs(maxThermicPower));
+    var colors = ["#0000A0", "white", "#E42217"];
     var color = d3.scale.linear()
-        .domain(d3.extent(data, function (d) { return d.temp_delta; }))
+        .domain([-colorSpanExtension, 0, colorSpanExtension])
         .range(colors);
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -27,7 +30,7 @@ function buildCalorimeterCharts(error, responseData) {
         .x(function (d) { return x(d.date); })
         .y0(function (d) { return y(d.temp_o); })
         .y1(function (d) { return y(d.temp_i); });
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(".chart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -46,7 +49,7 @@ function buildCalorimeterCharts(error, responseData) {
         .data(data)
         .enter().append("stop")
         .attr("offset", function (d) { return xGradient(d.date) + "%"; })
-        .attr("stop-color", function (d) { return color(d.temp_delta); });
+        .attr("stop-color", function (d) { return color(CalorimeterData.getThermicPower(d)); });
     svg.append("path")
         .datum(data)
         .attr("class", "area")
@@ -55,7 +58,14 @@ function buildCalorimeterCharts(error, responseData) {
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .append("text")
+        .attr("y", -16)
+        .attr("x", width)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Time");
+    ;
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -66,14 +76,23 @@ function buildCalorimeterCharts(error, responseData) {
         .style("text-anchor", "end")
         .text("Temperature");
 }
+var Constants = (function () {
+    function Constants() {
+    }
+    Constants.waterSpecificHeat = 4.186;
+    return Constants;
+})();
 var CalorimeterData = (function () {
     function CalorimeterData(row, dateString) {
         var parseDate = d3.time.format.iso.parse;
         this.date = parseDate(dateString);
         this.temp_i = +row["temp-i_C"];
         this.temp_o = +row["temp-o_C"];
-        this.flowrate = +row["flowrate_lm"];
+        this.flowrate = +row["flowrate_lm"] / 60 / 1000;
         this.temp_delta = this.temp_o - this.temp_i;
     }
+    CalorimeterData.getThermicPower = function (d) {
+        return d.temp_delta * d.flowrate * Constants.waterSpecificHeat * 1000000;
+    };
     return CalorimeterData;
 })();
