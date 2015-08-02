@@ -1,6 +1,12 @@
 //d3.tsv<CalorimeterData>("data/sensor1.tsv", (d):CalorimeterData => { return new CalorimeterData(d); }, buildCalorimeterCharts);
-d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterCharts);
-function buildCalorimeterCharts(error, responseData) {
+d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterOnOffCharts);
+d3.json("data/2015-07-17-cal-15230008024018.json", buildCalorimeterInverterCharts);
+function buildCalorimeterInverterCharts(error, responseData) {
+    var data = CalorimeterData.parseJsonToArray(responseData);
+    var chart = new CalorimeterChart(data);
+    chart.draw(".inverterChart");
+}
+function buildCalorimeterOnOffCharts(error, responseData) {
     var data = CalorimeterData.parseJsonToArray(responseData);
     var chart = new CalorimeterChart(data);
     chart.draw(".onOffChart");
@@ -44,6 +50,12 @@ var CalorimeterChart = (function () {
             .x(function (d) { return _this.xScale(d.date); })
             .y0(function (d) { return _this.yScale(d.temp_o); })
             .y1(function (d) { return _this.yScale(d.temp_i); });
+        this.lineTemp_o = d3.svg.line()
+            .x(function (d) { return _this.xScale(d.date); })
+            .y(function (d) { return _this.yScale(d.temp_o); });
+        this.lineTemp_i = d3.svg.line()
+            .x(function (d) { return _this.xScale(d.date); })
+            .y(function (d) { return _this.yScale(d.temp_i); });
     }
     CalorimeterChart.prototype.draw = function (selector) {
         var self = this;
@@ -67,6 +79,11 @@ var CalorimeterChart = (function () {
             .attr("class", "area")
             .attr("d", this.area)
             .style("fill", "url(#temperature-gradient)");
+        svg.append('svg:path')
+            .attr('d', this.lineTemp_i(this.data))
+            .attr('stroke', 'blue')
+            .attr('stroke-width', 1)
+            .attr('fill', 'none');
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + this.height + ")")
@@ -86,7 +103,7 @@ var CalorimeterChart = (function () {
             .attr("y", 6)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
-            .text("Temperature");
+            .text("Temperature [C]");
     };
     return CalorimeterChart;
 })();

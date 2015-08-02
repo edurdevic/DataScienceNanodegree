@@ -1,15 +1,19 @@
 //d3.tsv<CalorimeterData>("data/sensor1.tsv", (d):CalorimeterData => { return new CalorimeterData(d); }, buildCalorimeterCharts);
 
-d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterCharts);
+d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterOnOffCharts);
+d3.json("data/2015-07-17-cal-15230008024018.json", buildCalorimeterInverterCharts);
 
 
-function buildCalorimeterCharts (error, responseData) {
+function buildCalorimeterInverterCharts (error, responseData) {
+   var data = CalorimeterData.parseJsonToArray(responseData);
+   var chart = new CalorimeterChart(data);
+   chart.draw(".inverterChart");
+}
 
+function buildCalorimeterOnOffCharts (error, responseData) {
    var data = CalorimeterData.parseJsonToArray(responseData);
    var chart = new CalorimeterChart(data);
    chart.draw(".onOffChart");
-
-
 }
 
 class Constants {
@@ -30,6 +34,8 @@ class CalorimeterChart {
    private colorScale: d3.scale.Linear<number, number>;
 
    private area: d3.svg.Area<CalorimeterData>;
+   private lineTemp_i: d3.svg.Line<CalorimeterData>;
+   private lineTemp_o: d3.svg.Line<CalorimeterData>;
    private xAxis;
    private yAxis;
 
@@ -70,6 +76,14 @@ class CalorimeterChart {
           .y0((d) => { return this.yScale(d.temp_o); })
           .y1((d) => { return this.yScale(d.temp_i); });
 
+      this.lineTemp_o = d3.svg.line<CalorimeterData>()
+         .x((d):number => { return this.xScale(d.date); })
+         .y((d) => { return this.yScale(d.temp_o); });
+
+      this.lineTemp_i = d3.svg.line<CalorimeterData>()
+         .x((d):number => { return this.xScale(d.date); })
+         .y((d) => { return this.yScale(d.temp_i); });
+
    }
 
    public draw(selector: string): void {
@@ -100,6 +114,20 @@ class CalorimeterChart {
            .attr("d", this.area)
            .style("fill", "url(#temperature-gradient)");
 
+       // Temo_i line
+       svg.append('svg:path')
+           .attr('d', this.lineTemp_i(this.data))
+           .attr('stroke', 'blue')
+           .attr('stroke-width', 1)
+           .attr('fill', 'none');
+
+        // Temo_o line
+        //svg.append('svg:path')
+      //      .attr('d', this.lineTemp_o(this.data))
+         //   .attr('stroke', 'red')
+            //.attr('stroke-width', 1)
+            //.attr('fill', 'none');
+
        // X axis
        svg.append("g")
            .attr("class", "x axis")
@@ -121,7 +149,7 @@ class CalorimeterChart {
            .attr("y", 6)
            .attr("dy", ".71em")
            .style("text-anchor", "end")
-           .text("Temperature");
+           .text("Temperature [C]");
    }
 }
 

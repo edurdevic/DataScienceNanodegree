@@ -5,10 +5,29 @@
   <link rel="stylesheet" href="/css/master.css" media="screen" title="no title" charset="utf-8">
 </head>
 <body>
-    <h1>Data Visualization with D3 JS</h1>
-    <h2>Calorimeter measured temperatures and thermic power</h2>
+    <h1>Thermic power produced by a heat pumps</h1>
+    <p>
+      Thermic pumps use electric power to rise or lower the temperature of a thermo-vector (usually water).
+    </p>
+    <p>
+      The following charts shows the water input (temp_i) and output (temp_o) temperature.
+      The area between temp_i and temo_o is coloured by the heating (red) or cooling (blue) thermic power given from the heat pump.
+    </p>
+
+    <h2>Thermic power produced by "on/off" thermic pumps</h2>
+    <p>
+      On/Off pumps are unable to modulate the compressor power. To mantain the water temperature in a certain temperature range
+      those pumps have to sitch on and off.
+    </p>
     <svg class="onOffChart"></svg>
 
+
+    <h2>Thermic power produced by "inverter" thermic pumps</h2>
+    <p>
+      Inverter pumps are able to modulate the compressor power.<br />
+      Instead of going on and off, those pumps can lower the
+    </p>
+    <svg class="inverterChart"></svg>
 
     <script src="/bower_components/d3/d3.js"></script>
     <script src="app.js"></script>
