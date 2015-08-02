@@ -4,115 +4,125 @@ d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterCharts);
 
 
 function buildCalorimeterCharts (error, responseData) {
-   var margin = {top: 20, right: 20, bottom: 30, left: 50},
-       width = 960 - margin.left - margin.right,
-       height = 500 - margin.top - margin.bottom;
 
-   var data:CalorimeterData[] = [];
-
-   for (var i in responseData.content) {
-      var item = responseData.content[i];
-      data.push(new CalorimeterData(item, i));
-   }
+   var data = CalorimeterData.parseJsonToArray(responseData);
+   var chart = new CalorimeterChart(data);
+   chart.draw(".onOffChart");
 
 
-    var x = d3.time.scale()
-        .range([0, width]);
-
-    var xGradient = d3.time.scale()
-           .range([0, 100]);
-
-    var y = d3.scale.linear()
-        .range([height, 0]);
-
-
-    //var minDeltaT: number = d3.min(data, (d) => { return d.temp_delta; }); //Celsius
-    //var maxDeltaT: number = d3.max(data, (d) => { return d.temp_delta; });
-
-    var minThermicPower: number = d3.min(data, CalorimeterData.getThermicPower);
-    var maxThermicPower: number = d3.max(data, CalorimeterData.getThermicPower);
-
-    var colorSpanExtension: number = Math.max(Math.abs(minThermicPower), Math.abs(maxThermicPower));
-
-
-
-                   // EarthBlue   white    LoveRed
-    var colors:any = ["#0000A0", "white", "#E42217"];
-    var color = d3.scale.linear()
-        .domain([-colorSpanExtension, 0 , colorSpanExtension])
-        .range(colors);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left");
-
-    var area = d3.svg.area<CalorimeterData>()
-        .x((d) => { return x(d.date); })
-        .y0((d) => { return y(d.temp_o); })
-        .y1((d) => { return y(d.temp_i); });
-
-
-    var svg = d3.select(".chart")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    if (error) throw error;
-
-
-    xGradient.domain(d3.extent<any>(data, (d) => { return d.date; }));
-    x.domain(d3.extent<any>(data, (d) => { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.temp_i; })]);
-
-    svg.append("linearGradient")
-      .attr("id", "temperature-gradient")
-      .attr("gradientUnits", "userSpaceOnUse")
-      .attr("x1", 0).attr("y1", 0)
-      .attr("x2", width).attr("y2", 0)
-    .selectAll("stop")
-      .data(data)
-    .enter().append("stop")
-      .attr("offset", function(d) { return xGradient(d.date) + "%"; })
-      .attr("stop-color", function(d) { return color(CalorimeterData.getThermicPower(d)); });
-
-    // Area with gradient fill
-    svg.append("path")
-        .datum(data)
-        .attr("class", "area")
-        .attr("d", area)
-        .style("fill", "url(#temperature-gradient)");
-
-    // X axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-        .attr("y", -16)
-        .attr("x", width)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Time");;
-
-    // Y axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Temperature");
 }
 
 class Constants {
    public static waterSpecificHeat: number = 4.186; // [J/(g*C)]
+}
+
+class CalorimeterChart {
+   public margin = {top: 20, right: 20, bottom: 30, left: 50};
+   public width = 960 - this.margin.left - this.margin.right;
+   public height = 500 - this.margin.top - this.margin.bottom;
+                     // EarthBlue   white    LoveRed
+   public colors:any = ["#0000A0", "white", "#E42217"];
+   public data:CalorimeterData[];
+
+   private xScale: d3.time.Scale<number, number>;
+   private xGradientScale: d3.time.Scale<number, number>;
+   private yScale: d3.scale.Linear<number, number>;
+   private colorScale: d3.scale.Linear<number, number>;
+
+   private area: d3.svg.Area<CalorimeterData>;
+   private xAxis;
+   private yAxis;
+
+   constructor(data:CalorimeterData[]) {
+      this.data = data;
+
+      this.xScale = d3.time.scale()
+          .range([0, this.width])
+          .domain(d3.extent<any>(data, (d) => { return d.date; }));
+
+      this.xGradientScale = d3.time.scale()
+          .range([0, 100])
+          .domain(d3.extent<any>(data, (d) => { return d.date; }));
+
+      this.yScale = d3.scale.linear()
+          .range([this.height, 0])
+          .domain([0, d3.max(data, function(d) { return d.temp_i; })]);
+
+
+      var minThermicPower: number = d3.min(data, CalorimeterData.getThermicPower);
+      var maxThermicPower: number = d3.max(data, CalorimeterData.getThermicPower);
+      var thermicPowerExtension: number = Math.max(Math.abs(minThermicPower), Math.abs(maxThermicPower));
+
+      this.colorScale = d3.scale.linear()
+          .domain([-thermicPowerExtension, 0 , thermicPowerExtension])
+          .range(this.colors);
+
+      this.xAxis = d3.svg.axis()
+          .scale(this.xScale)
+          .orient("bottom");
+
+      this.yAxis = d3.svg.axis()
+          .scale(this.yScale)
+          .orient("left");
+
+      this.area = d3.svg.area<CalorimeterData>()
+          .x((d) => { return this.xScale(d.date); })
+          .y0((d) => { return this.yScale(d.temp_o); })
+          .y1((d) => { return this.yScale(d.temp_i); });
+
+   }
+
+   public draw(selector: string): void {
+      var self = this;
+
+      var svg = d3.select(selector)
+         .attr("width", this.width + this.margin.left + this.margin.right)
+         .attr("height", this.height + this.margin.top + this.margin.bottom)
+         .append("g")
+         .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+       //Color gradient
+      svg.append("linearGradient")
+         .attr("id", "temperature-gradient")
+         .attr("gradientUnits", "userSpaceOnUse")
+         .attr("x1", 0).attr("y1", 0)
+         .attr("x2", this.width).attr("y2", 0)
+         .selectAll("stop")
+         .data(this.data)
+         .enter().append("stop")
+         .attr("offset", (d) => { return self.xGradientScale(d.date) + "%"; })
+         .attr("stop-color", (d) => { return self.colorScale(CalorimeterData.getThermicPower(d)); });
+
+       // Area with gradient fill
+       svg.append("path")
+           .datum(this.data)
+           .attr("class", "area")
+           .attr("d", this.area)
+           .style("fill", "url(#temperature-gradient)");
+
+       // X axis
+       svg.append("g")
+           .attr("class", "x axis")
+           .attr("transform", "translate(0," + this.height + ")")
+           .call(this.xAxis)
+           .append("text")
+           .attr("y", -16)
+           .attr("x", this.width)
+           .attr("dy", ".71em")
+           .style("text-anchor", "end")
+           .text("Time");;
+
+       // Y axis
+       svg.append("g")
+           .attr("class", "y axis")
+           .call(this.yAxis)
+           .append("text")
+           .attr("transform", "rotate(-90)")
+           .attr("y", 6)
+           .attr("dy", ".71em")
+           .style("text-anchor", "end")
+           .text("Temperature");
+   }
 }
 
 class CalorimeterData {
@@ -129,6 +139,16 @@ class CalorimeterData {
    public static getThermicPower(d: CalorimeterData): number {
       //        [C]       *  [m3/s]    *        [J/(g*C)]            * [m3 -> g] =  [J*s] = [W]
       return d.temp_delta * d.flowrate * Constants.waterSpecificHeat * 1000000;   // [W]
+   }
+
+   public static parseJsonToArray(json: any): CalorimeterData[] {
+      var data:CalorimeterData[] = [];
+
+      for (var i in json.content) {
+         var item = json.content[i];
+         data.push(new CalorimeterData(item, i));
+      }
+      return data;
    }
 
    date: Date;
