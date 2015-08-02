@@ -1,19 +1,19 @@
-//d3.tsv<CalorimeterData>("data/sensor1.tsv", (d):CalorimeterData => { return new CalorimeterData(d); }, buildCalorimeterCharts);
 
 d3.json("data/2015-07-17-cal-15230001024015.json", buildCalorimeterOnOffCharts);
 d3.json("data/2015-07-17-cal-15230008024018.json", buildCalorimeterInverterCharts);
 
 
-function buildCalorimeterInverterCharts (error, responseData) {
-   var data = CalorimeterData.parseJsonToArray(responseData);
-   var chart = new CalorimeterChart(data);
-   chart.draw(".inverterChart");
-}
 
 function buildCalorimeterOnOffCharts (error, responseData) {
    var data = CalorimeterData.parseJsonToArray(responseData);
    var chart = new CalorimeterChart(data);
    chart.draw(".onOffChart");
+}
+
+function buildCalorimeterInverterCharts (error, responseData) {
+   var data = CalorimeterData.parseJsonToArray(responseData);
+   var chart = new CalorimeterChart(data);
+   chart.draw(".inverterChart");
 }
 
 class Constants {
@@ -24,6 +24,10 @@ class CalorimeterChart {
    public margin = {top: 20, right: 20, bottom: 30, left: 50};
    public width = 960 - this.margin.left - this.margin.right;
    public height = 500 - this.margin.top - this.margin.bottom;
+   public legendRectSize = 18;
+   public legendSpacing = 4;
+   public legendTextSize = 50;
+
                      // EarthBlue   white    LoveRed
    public colors:any = ["#0000A0", "white", "#E42217"];
    public data:CalorimeterData[];
@@ -38,6 +42,9 @@ class CalorimeterChart {
    private lineTemp_o: d3.svg.Line<CalorimeterData>;
    private xAxis;
    private yAxis;
+
+   private minThermicPower: number;
+   private maxThermicPower: number;
 
    constructor(data:CalorimeterData[]) {
       this.data = data;
@@ -55,9 +62,9 @@ class CalorimeterChart {
           .domain([0, d3.max(data, function(d) { return d.temp_i; })]);
 
 
-      var minThermicPower: number = d3.min(data, CalorimeterData.getThermicPower);
-      var maxThermicPower: number = d3.max(data, CalorimeterData.getThermicPower);
-      var thermicPowerExtension: number = Math.max(Math.abs(minThermicPower), Math.abs(maxThermicPower));
+      this.minThermicPower = d3.min(data, CalorimeterData.getThermicPower);
+      this.maxThermicPower = d3.max(data, CalorimeterData.getThermicPower);
+      var thermicPowerExtension: number = Math.max(Math.abs(this.minThermicPower), Math.abs(this.maxThermicPower));
 
       this.colorScale = d3.scale.linear()
           .domain([-thermicPowerExtension, 0 , thermicPowerExtension])
@@ -147,9 +154,37 @@ class CalorimeterChart {
            .append("text")
            .attr("transform", "rotate(-90)")
            .attr("y", 6)
+           .attr("x", -10)
            .attr("dy", ".71em")
            .style("text-anchor", "end")
            .text("Temperature [C]");
+
+       // legend
+       var legend = svg.selectAll('.legend')
+           .data([this.minThermicPower, 0, this.maxThermicPower].sort().reverse())
+           .enter()
+           .append('g')
+           .attr('class', 'legend')
+           .attr('transform', function(d, i) {
+             var height = self.legendRectSize + self.legendSpacing;
+             var offset =  height * self.colorScale.domain().length / 2;
+             var horz = self.width - self.legendTextSize - self.legendRectSize;
+             var vert = i * height;
+             return 'translate(' + horz + ',' + vert + ')';
+           });
+
+      legend.append('rect')
+         .attr('width', self.legendRectSize)
+         .attr('height', self.legendRectSize)
+         .style('fill', self.colorScale)
+         .style('stroke', 'gray')
+         .attr('stroke-width', 1);
+
+      legend.append('text')
+         .attr('x', self.legendRectSize + self.legendSpacing + self.legendTextSize)
+         .attr('y', self.legendRectSize - self.legendSpacing)
+         .style('text-anchor', 'end')
+         .text(function(d) { return (d / 1000).toFixed(1) + " kW"; });
    }
 }
 

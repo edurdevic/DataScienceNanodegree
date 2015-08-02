@@ -13,3 +13,11 @@
     font-family: sans-serif;
     font-size: 11px;
 }
+
+.legend {
+   font-family: sans-serif;
+   font-size: 11px;
+}
+rect {
+  stroke-width: 2;
+}

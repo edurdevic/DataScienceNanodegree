@@ -5,26 +5,51 @@
   <link rel="stylesheet" href="/css/master.css" media="screen" title="no title" charset="utf-8">
 </head>
 <body>
-    <h1>Thermic power produced by a heat pumps</h1>
+    <h1>Thermic power produced by heat pumps</h1>
     <p>
-      Thermic pumps use electric power to rise or lower the temperature of a thermo-vector (usually water).
+      Thermic pumps use electric power to rise or lower the temperature of a thermo-vector (usually water)
+      flowing through the heat pump.
     </p>
     <p>
-      The following charts shows the water input (temp_i) and output (temp_o) temperature.
-      The area between temp_i and temo_o is coloured by the heating (red) or cooling (blue) thermic power given from the heat pump.
+      <svg class="schema" width="400" height="120">
+         <g transform="translate(50,0)">
+            <g transform="translate(100, 10)">
+               <rect width="150" height="100" style="fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)" />
+               <text y="50" x="35">Heat pump</text>
+            </g>
+
+            <!-- Arrow temp_i -->
+            <g transform="translate(0,60)" style="fill:rgb(0,0,255)">
+               <text y="-6" x="20">temp_i</text>
+               <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,255);" />
+               <path d="M95 -5 L100 0 L95 5 Z" />
+            </g>
+
+            <!-- Arrow temp_o -->
+            <g transform="translate(250,60)" style="fill:rgb(0,0,0)">
+               <text y="-6" x="20">temp_o</text>
+               <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,0);" />
+               <path d="M95 -5 L100 0 L95 5 Z" />
+            </g>
+         </g>
+      </svg>
+    </p>
+    <p>
+      The following charts shows the input (temp_i) and output (temp_o) temperature of the water flowing through the heat pump.
+      The area between temp_i and temop_o is coloured by the heating (red) or cooling (blue) thermic power provided.
     </p>
 
     <h2>Thermic power produced by "on/off" thermic pumps</h2>
     <p>
       On/Off pumps are unable to modulate the compressor power. To mantain the water temperature in a certain temperature range
-      those pumps have to sitch on and off.
+      those pumps have to sitch on and off frequently.
     </p>
     <svg class="onOffChart"></svg>
 
 
     <h2>Thermic power produced by "inverter" thermic pumps</h2>
     <p>
-      Inverter pumps are able to modulate the compressor power.<br />
+      Inverter pumps are able to modulate the compressor power, therefore they can adapt to the .<br />
       Instead of going on and off, those pumps can lower the
     </p>
     <svg class="inverterChart"></svg>

@@ -1682,32 +1682,32 @@
         },
         "2015-07-17T07:28:02+02:00": {
             "temp-i_C": 25.5,
-            "flowrate_lm": 9.3,
+            "flowrate_lm": 0.0,
             "temp-o_C": 28.7
         },
         "2015-07-17T07:28:07+02:00": {
             "temp-i_C": 24.2,
-            "flowrate_lm": 14.2,
+            "flowrate_lm": 0.0,
             "temp-o_C": 28.7
         },
         "2015-07-17T07:28:12+02:00": {
             "temp-i_C": 21.6,
-            "flowrate_lm": 23.6,
+            "flowrate_lm": 0.0,
             "temp-o_C": 27.5
         },
         "2015-07-17T07:28:17+02:00": {
             "temp-i_C": 20.8,
-            "flowrate_lm": 23.6,
+            "flowrate_lm": 0.0,
             "temp-o_C": 26.3
         },
         "2015-07-17T07:28:22+02:00": {
             "temp-i_C": 20.6,
-            "flowrate_lm": 23.6,
+            "flowrate_lm": 0.0,
             "temp-o_C": 23.6
         },
         "2015-07-17T07:28:27+02:00": {
             "temp-i_C": 20.7,
-            "flowrate_lm": 23.8,
+            "flowrate_lm": 0.0,
             "temp-o_C": 22.7
         },
         "2015-07-17T07:28:32+02:00": {
