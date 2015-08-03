@@ -187,6 +187,43 @@ class CalorimeterChart {
          .attr('y', self.legendRectSize - self.legendSpacing)
          .style('text-anchor', 'end')
          .text(function(d) { return (d / 1000).toFixed(1) + " kW"; });
+
+     // legend lines
+     var legend2 = svg
+         .append('g')
+         .attr('class', 'legend_temp')
+         .attr('transform', 'translate(' + (self.width - self.legendTextSize - self.legendRectSize) + ',' + ((self.legendRectSize + self.legendSpacing) * 4) + ')')
+
+     legend2.append('line')
+         .attr('x1', 0)
+         .attr('y1', self.legendRectSize/2)
+         .attr('y2', self.legendRectSize/2)
+         .attr('x2', self.legendRectSize)
+         .style('stroke', 'blue')
+         .attr('stroke-width', 1);
+
+     legend2.append('text')
+         .attr('x', self.legendSpacing + self.legendRectSize)
+         .attr('y', self.legendRectSize - self.legendSpacing)
+         .text("temp_i");
+
+     var legend2 = svg
+         .append('g')
+         .attr('class', 'legend_temp')
+         .attr('transform', 'translate(' + (self.width - self.legendTextSize - self.legendRectSize) + ',' + ((self.legendRectSize + self.legendSpacing) * 5) + ')')
+
+     legend2.append('line')
+         .attr('x1', 0)
+         .attr('y1', self.legendRectSize/2)
+         .attr('y2', self.legendRectSize/2)
+         .attr('x2', self.legendRectSize)
+         .style('stroke', 'black')
+         .attr('stroke-width', 1);
+
+     legend2.append('text')
+         .attr('x', self.legendSpacing + self.legendRectSize)
+         .attr('y', self.legendRectSize - self.legendSpacing)
+         .text("temp_o");
    }
 }
 
