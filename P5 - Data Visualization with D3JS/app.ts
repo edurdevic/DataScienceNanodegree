@@ -7,13 +7,13 @@ d3.json("data/2015-07-17-cal-15230008024018.json", buildCalorimeterInverterChart
 function buildCalorimeterOnOffCharts (error, responseData) {
    var data = CalorimeterData.parseJsonToArray(responseData);
    var chart = new CalorimeterChart(data);
-   chart.draw(".onOffChart");
+   chart.draw(".onOffChart", 1);
 }
 
 function buildCalorimeterInverterCharts (error, responseData) {
    var data = CalorimeterData.parseJsonToArray(responseData);
    var chart = new CalorimeterChart(data);
-   chart.draw(".inverterChart");
+   chart.draw(".inverterChart", 2);
 }
 
 class Constants {
@@ -22,7 +22,7 @@ class Constants {
 
 class CalorimeterChart {
    public margin = {top: 20, right: 20, bottom: 30, left: 50};
-   public width = 960 - this.margin.left - this.margin.right;
+   public width = 800 - this.margin.left - this.margin.right;
    public height = 500 - this.margin.top - this.margin.bottom;
    public legendRectSize = 18;
    public legendSpacing = 4;
@@ -93,7 +93,7 @@ class CalorimeterChart {
 
    }
 
-   public draw(selector: string): void {
+   public draw(selector: string, id:number): void {
       var self = this;
 
       var svg = d3.select(selector)
@@ -104,7 +104,7 @@ class CalorimeterChart {
 
        //Color gradient
       svg.append("linearGradient")
-         .attr("id", "temperature-gradient")
+         .attr("id", "temperature-gradient" + id)
          .attr("gradientUnits", "userSpaceOnUse")
          .attr("x1", 0).attr("y1", 0)
          .attr("x2", this.width).attr("y2", 0)
@@ -119,21 +119,23 @@ class CalorimeterChart {
            .datum(this.data)
            .attr("class", "area")
            .attr("d", this.area)
-           .style("fill", "url(#temperature-gradient)");
+           .style("fill", "url(#temperature-gradient" + id + ")");
 
        // Temo_i line
        svg.append('svg:path')
            .attr('d', this.lineTemp_i(this.data))
            .attr('stroke', 'blue')
            .attr('stroke-width', 1)
+           .attr('stroke-opacity', 0.5)
            .attr('fill', 'none');
 
         // Temo_o line
-        //svg.append('svg:path')
-      //      .attr('d', this.lineTemp_o(this.data))
-         //   .attr('stroke', 'red')
-            //.attr('stroke-width', 1)
-            //.attr('fill', 'none');
+        svg.append('svg:path')
+            .attr('d', this.lineTemp_o(this.data))
+            .attr('stroke', 'black')
+            .attr('stroke-width', 1)
+            .attr('stroke-opacity', 0.5)
+            .attr('fill', 'none');
 
        // X axis
        svg.append("g")

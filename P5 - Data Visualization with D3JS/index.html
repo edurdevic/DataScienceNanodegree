@@ -2,57 +2,90 @@
 <html>
 <head>
    <meta http-equiv="content-type" content="text/html; charset=UTF8">
-  <link rel="stylesheet" href="/css/master.css" media="screen" title="no title" charset="utf-8">
+   <link rel="stylesheet" href="/css/master.css" media="screen" title="no title" charset="utf-8">
+   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8">
 </head>
 <body>
-    <h1>Thermic power produced by heat pumps</h1>
-    <p>
-      Thermic pumps use electric power to rise or lower the temperature of a thermo-vector (usually water)
-      flowing through the heat pump.
-    </p>
-    <p>
-      <svg class="schema" width="400" height="120">
-         <g transform="translate(50,0)">
-            <g transform="translate(100, 10)">
-               <rect width="150" height="100" style="fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)" />
-               <text y="50" x="35">Heat pump</text>
-            </g>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <h1>Thermic power produced by heat pumps</h1>
+                <p>
+                  Thermic pumps use electric power to exchange thermic energy between two thermo-vectors
+                  flowing through the heat pump. Usually one thermo-vector is the ambient air present outside and the other
+                  is water (which flows into an internal circuit to carry the heating or cooling power into the building).
+                </p>
+                <p>
+                    In the following charts we will consider only the internal loop of water flowing through the heat pump,
+                    as simplified in the following schema.
+                </p>
 
-            <!-- Arrow temp_i -->
-            <g transform="translate(0,60)" style="fill:rgb(0,0,255)">
-               <text y="-6" x="20">temp_i</text>
-               <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,255);" />
-               <path d="M95 -5 L100 0 L95 5 Z" />
-            </g>
+                <p>
+                  <svg class="schema" width="400" height="120">
+                     <g transform="translate(50,0)">
+                        <g transform="translate(100, 10)">
+                           <rect width="150" height="100" style="fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)" />
+                           <text y="50" x="35">Heat pump</text>
+                        </g>
 
-            <!-- Arrow temp_o -->
-            <g transform="translate(250,60)" style="fill:rgb(0,0,0)">
-               <text y="-6" x="20">temp_o</text>
-               <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,0);" />
-               <path d="M95 -5 L100 0 L95 5 Z" />
-            </g>
-         </g>
-      </svg>
-    </p>
-    <p>
-      The following charts shows the input (temp_i) and output (temp_o) temperature of the water flowing through the heat pump.
-      The area between temp_i and temop_o is coloured by the heating (red) or cooling (blue) thermic power provided.
-    </p>
+                        <!-- Arrow temp_i -->
+                        <g transform="translate(0,60)" style="fill:rgb(0,0,255)">
+                           <text y="-6" x="20">temp_i</text>
+                           <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,255);" />
+                           <path d="M95 -5 L100 0 L95 5 Z" />
+                        </g>
 
-    <h2>Thermic power produced by "on/off" thermic pumps</h2>
-    <p>
-      On/Off pumps are unable to modulate the compressor power. To mantain the water temperature in a certain temperature range
-      those pumps have to sitch on and off frequently.
-    </p>
-    <svg class="onOffChart"></svg>
+                        <!-- Arrow temp_o -->
+                        <g transform="translate(250,60)" style="fill:rgb(0,0,0)">
+                           <text y="-6" x="20">temp_o</text>
+                           <line x1="0" y1="0" x2="100" y2="0" style="stroke-width:2;stroke:rgb(0,0,0);" />
+                           <path d="M95 -5 L100 0 L95 5 Z" />
+                        </g>
+                     </g>
+                  </svg>
+                </p>
+                <p>
+                    The thermic power that the heat pump provides to the system is calculated as follows:
+                </p>
 
+                <pre>Thermic power [W] = (temp_o [C] - temp_i [C]) * flowrate [m3/s] * water_specific_heat [J/(m3*C)]</pre>
 
-    <h2>Thermic power produced by "inverter" thermic pumps</h2>
-    <p>
-      Inverter pumps are able to modulate the compressor power, therefore they can adapt to the .<br />
-      Instead of going on and off, those pumps can lower the
-    </p>
-    <svg class="inverterChart"></svg>
+                <p>
+                    Given that flowrate and water_specific_heat can be approximated as constants in our system, the thermic power
+                    provided is proportional to the difference between temp_o and temp_i.
+                </p>
+
+                <p>
+                  The charts show the input (temp_i) and output (temp_o) temperature of the water flowing through the heat pump. <br />
+
+                  The area between temp_i and temop_o is coloured by the heating (red) or cooling (blue) thermic power provided.
+                </p>
+
+                <h2>Thermic power produced by "on/off" thermic pumps</h2>
+                <p>
+                  On/Off pumps are unable to modulate the compressor power.
+                </p>
+                <svg class="onOffChart"></svg>
+                <p>
+                    Thermic pumps are programmed to mantain the input water temperature (temp_i) between 10 and 14 degree C.
+                    Since the thermic demand from the refrigerated area is lower than the thermic power provided by the heat pump,
+                    the latest has to modulate it's power by switching on when the temperature temp_i reaches 14 degrees C and off
+                    when the temperature temp_i lowers below 10 degrees C.
+                </p>
+
+                <h2>Thermic power produced by "inverter" thermic pumps</h2>
+                <p>
+                    Inverter pumps are able to modulate the compressor power.
+                </p>
+                <svg class="inverterChart"></svg>
+                <p>
+                    Inverter pumps are programmed to keep the temp_i temperature at 10 degrees C.
+                    They use the maximum power (dark blue) to lower the system temperature until they reach the target 10 degrees.
+                    Then they progressively lower the compressor power until they find the optimal power to keep the system in balance with temp_i of 10 degrees C.
+                </p>
+            </div>
+        </div>
+    </div>
 
     <script src="/bower_components/d3/d3.js"></script>
     <script src="app.js"></script>

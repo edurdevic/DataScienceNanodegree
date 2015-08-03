@@ -3,12 +3,12 @@ d3.json("data/2015-07-17-cal-15230008024018.json", buildCalorimeterInverterChart
 function buildCalorimeterOnOffCharts(error, responseData) {
     var data = CalorimeterData.parseJsonToArray(responseData);
     var chart = new CalorimeterChart(data);
-    chart.draw(".onOffChart");
+    chart.draw(".onOffChart", 1);
 }
 function buildCalorimeterInverterCharts(error, responseData) {
     var data = CalorimeterData.parseJsonToArray(responseData);
     var chart = new CalorimeterChart(data);
-    chart.draw(".inverterChart");
+    chart.draw(".inverterChart", 2);
 }
 var Constants = (function () {
     function Constants() {
@@ -20,7 +20,7 @@ var CalorimeterChart = (function () {
     function CalorimeterChart(data) {
         var _this = this;
         this.margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        this.width = 960 - this.margin.left - this.margin.right;
+        this.width = 800 - this.margin.left - this.margin.right;
         this.height = 500 - this.margin.top - this.margin.bottom;
         this.legendRectSize = 18;
         this.legendSpacing = 4;
@@ -59,7 +59,7 @@ var CalorimeterChart = (function () {
             .x(function (d) { return _this.xScale(d.date); })
             .y(function (d) { return _this.yScale(d.temp_i); });
     }
-    CalorimeterChart.prototype.draw = function (selector) {
+    CalorimeterChart.prototype.draw = function (selector, id) {
         var self = this;
         var svg = d3.select(selector)
             .attr("width", this.width + this.margin.left + this.margin.right)
@@ -67,7 +67,7 @@ var CalorimeterChart = (function () {
             .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
         svg.append("linearGradient")
-            .attr("id", "temperature-gradient")
+            .attr("id", "temperature-gradient" + id)
             .attr("gradientUnits", "userSpaceOnUse")
             .attr("x1", 0).attr("y1", 0)
             .attr("x2", this.width).attr("y2", 0)
@@ -80,11 +80,18 @@ var CalorimeterChart = (function () {
             .datum(this.data)
             .attr("class", "area")
             .attr("d", this.area)
-            .style("fill", "url(#temperature-gradient)");
+            .style("fill", "url(#temperature-gradient" + id + ")");
         svg.append('svg:path')
             .attr('d', this.lineTemp_i(this.data))
             .attr('stroke', 'blue')
             .attr('stroke-width', 1)
+            .attr('stroke-opacity', 0.5)
+            .attr('fill', 'none');
+        svg.append('svg:path')
+            .attr('d', this.lineTemp_o(this.data))
+            .attr('stroke', 'black')
+            .attr('stroke-width', 1)
+            .attr('stroke-opacity', 0.5)
             .attr('fill', 'none');
         svg.append("g")
             .attr("class", "x axis")
