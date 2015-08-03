@@ -103,7 +103,6 @@ var CalorimeterChart = (function () {
             .attr("dy", ".71em")
             .style("text-anchor", "end")
             .text("Time");
-        ;
         svg.append("g")
             .attr("class", "y axis")
             .call(this.yAxis)
