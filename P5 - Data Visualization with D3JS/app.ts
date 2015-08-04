@@ -27,6 +27,7 @@ class CalorimeterChart {
    public legendRectSize = 18;
    public legendSpacing = 4;
    public legendTextSize = 50;
+   public tooltipVerticalSpacing = 12;
 
                      // EarthBlue   white    LoveRed
    public colors:any = ["#0000A0", "white", "#E42217"];
@@ -185,6 +186,74 @@ class CalorimeterChart {
          .attr('y', self.legendRectSize - self.legendSpacing)
          .style('text-anchor', 'end')
          .text(function(d) { return (d / 1000).toFixed(1) + " kW"; });
+
+         // Mouse line
+      var verticalLineGroup = svg
+            .append("g")
+            .attr('class', 'verticalLineGroup');
+
+      var verticalLine = verticalLineGroup
+           .append("line")
+           .attr("class", "verticalLine")
+           .attr("x1", 0)
+           .attr("y1", 0)
+           .attr("x2", 0)
+           .attr("y2", self.height)
+           .style("height", self.height)
+           .style("top", self.margin.top)
+           .style('stroke', 'gray')
+           .attr('stroke-width', 0.5);
+
+      var tooltip = verticalLineGroup
+            .append("g")
+            .attr("class", "tooltip")
+            .attr("transform", "translate(5,15)");
+
+      var tooltipTime = tooltip
+            .append("text")
+            .attr("class", "time")
+            .attr("x", 0)
+            .attr("y", self.tooltipVerticalSpacing * 0);
+
+      var tooltipPower = tooltip
+            .append("text")
+            .attr("class", "power")
+            .attr("x", 0)
+            .attr("y", self.tooltipVerticalSpacing * 1);
+
+      var tooltipTemp_i = tooltip
+            .append("text")
+            .attr("class", "temp_i")
+            .attr("x", 0)
+            .attr("y", self.tooltipVerticalSpacing * 2);
+
+      var tooltipTemp_o = tooltip
+            .append("text")
+            .attr("class", "temp_o")
+            .attr("x", 0)
+            .attr("y", self.tooltipVerticalSpacing * 3);
+
+      var tooltipFlowrate = tooltip
+            .append("text")
+            .attr("class", "flowrate")
+            .attr("x", 0)
+            .attr("y", self.tooltipVerticalSpacing * 4);
+
+        d3.select(selector)
+            .on("mousemove", function(){
+                  var mousex = d3.mouse(this)[0] - self.margin.left;
+                  verticalLineGroup.attr('transform', 'translate(' + (mousex) + ',0)');
+
+                  var time = self.xScale.invert(mousex);
+                  var calorimeterReading = CalorimeterData.getElementAtDate(self.data, time);
+
+                  tooltipTime.text("time: " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds());
+                  tooltipPower.text("power: " + (calorimeterReading.thermicPower / 1000).toFixed(1) + " kW");
+                  tooltipTemp_i.text("temp_i: " + calorimeterReading.temp_i + " C");
+                  tooltipTemp_o.text("temp_o: " + calorimeterReading.temp_o + " C");
+                  tooltipFlowrate.text("flowrate: " + (calorimeterReading.flowrate * 60000).toFixed(1) + " l/min");
+               });
+
    }
 }
 
@@ -197,6 +266,7 @@ class CalorimeterData {
       this.temp_o = +row["temp-o_C"];
       this.flowrate = +row["flowrate_lm"] / 60 / 1000; //conversion from l/min to m3/s
       this.temp_delta = this.temp_o - this.temp_i;
+      this.thermicPower = CalorimeterData.getThermicPower(this);
    }
 
    public static getThermicPower(d: CalorimeterData): number {
@@ -214,9 +284,20 @@ class CalorimeterData {
       return data;
    }
 
+   public static getElementAtDate(array: CalorimeterData[], date: Date) {
+      for (var i in array) {
+         var item = array[i];
+         if (item.date.valueOf() >= date.valueOf()) {
+            return item;
+         }
+      }
+      return null;
+   }
+
    date: Date;
    temp_i: number;      // [C]
    temp_o: number;      // [C]
    temp_delta: number;  // [C]
    flowrate: number;    // [m3/s]
+   thermicPower: number;
 }
