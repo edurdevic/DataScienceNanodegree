@@ -41,4 +41,8 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-
+<<<<<<< Updated upstream
+P5 - Data Visualization with D3JS/bower_components/
+=======
+.Rhistory
+>>>>>>> Stashed changes
