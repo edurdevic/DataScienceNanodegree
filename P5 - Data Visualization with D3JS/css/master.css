@@ -21,3 +21,13 @@
 rect {
   stroke-width: 2;
 }
+
+.tooltip {
+   font-family: sans-serif;
+   font-size: 11px;
+   color: black;
+}
+
+.verticalLineGroup .tooltip {
+    opacity: 1;
+}
