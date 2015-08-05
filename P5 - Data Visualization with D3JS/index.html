@@ -4,6 +4,7 @@
    <meta http-equiv="content-type" content="text/html; charset=UTF8">
    <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8">
+   <title>Inverter thermic pumps vs On/Off thermic pumps </title>
 </head>
 <body>
     <div class="container">
@@ -12,8 +13,8 @@
                 <h1>Thermic power produced by heat pumps</h1>
                 <p>
                   Thermic pumps use electric power to exchange thermic energy between two thermo-vectors
-                  flowing through the heat pump. Usually one thermo-vector is the ambient air present outside and the other
-                  is water (which flows into an internal circuit to carry the heating or cooling power into the building).
+                  flowing through the heat pump. The first is the ambient air present outside, and the other
+                  is water, which flows into an internal circuit to carry the heating or cooling power into the building.
                 </p>
                 <p>
                     In the following charts we will consider only the internal loop of water flowing through the heat pump,
@@ -69,13 +70,13 @@
                 <p>
                     Thermic pumps are programmed to mantain the input water temperature (temp_i) between 10 and 14 degree C.
                     Since the thermic demand from the refrigerated area is lower than the thermic power provided by the heat pump,
-                    the latest has to modulate it's power by switching on when the temperature temp_i reaches 14 degrees C and off
+                    the latest has to modulate its power by switching on when the temperature temp_i reaches 14 degrees C and off
                     when the temperature temp_i lowers below 10 degrees C.
                 </p>
 
                 <h2>Thermic power produced by "inverter" thermic pumps</h2>
                 <p>
-                    Inverter pumps are able to modulate the compressor power.
+                    Inverter pumps are able to modulate the compressor speed, therefore its power.
                 </p>
                 <svg class="inverterChart"></svg>
                 <p>
@@ -83,6 +84,15 @@
                     They use the maximum power (dark blue) to lower the system temperature until they reach the target 10 degrees.
                     Then they progressively lower the compressor power until they find the optimal power to keep the system in balance with temp_i of 10 degrees C.
                 </p>
+
+                <h2>Inverter vs On/Off</h2>
+                <p>
+                   Comparing two heat pumps of about the same maximum power, we can see that they have quite
+                   different consumption pattern. They both provide a comparable amount of thermic power, but
+                   inverter pumps have more stable output temperature and energy consumption.
+                </p>
+                <p>&nbsp;</p>
+                <p>Erni Durdevic</p>
             </div>
         </div>
     </div>
