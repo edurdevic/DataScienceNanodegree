@@ -276,6 +276,17 @@ class CalorimeterChart {
          .attr("fill", "black")
          .attr("transform", "translate(5," + self.tooltipVerticalOffset + ")");
 
+      var tooltipBox = tooltip
+         .append('rect')
+         .attr('width', 120)
+         .attr('height', self.tooltipVerticalSpacing * 6)
+         .attr('x', -5)
+         .attr('y', -(self.tooltipVerticalSpacing * 1.25))
+         .style('fill', 'white')
+         .style('stroke', 'gray')
+         .style('opacity', 0)
+         .attr('stroke-width', 0.5);
+
       var tooltipTime = tooltip
          .append("text")
          .attr("class", "time")
@@ -322,6 +333,7 @@ class CalorimeterChart {
          tooltipTemp_o.text("temp_o: " + calorimeterReading.temp_o + " C");
          // Transforming m3/s to l/min
          tooltipFlowrate.text("flowrate: " + (calorimeterReading.flowrate * 60000).toFixed(1) + " l/min");
+         tooltipBox.style('opacity', 0.8);
       });
 
    }
