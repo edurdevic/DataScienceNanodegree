@@ -13,10 +13,10 @@ I used Typescript to better organize and type-check javascript code. Both Typesc
 Before starting this project I already had confidence with the datasets.
 I wanted to create a data visualization that allows to see how a heating or cooling system is performing and spot at a glance if there is a possible issue in the installation.
 The important data to visualize were the following:
-.) Absolute input temperature
-.) Absolute output temperature
-.) Temperature delta (difference between input and output)
-.) Thermic power "produced"
+* Absolute input temperature
+* Absolute output temperature
+* Temperature delta (difference between input and output)
+* Thermic power "produced"
 
 The first three points were easily addressable with an area chart on temperatures.
 Temperature delta indirectly represents the power as well (for constant flowrate), so it was not planned as direct representation originally.
@@ -51,10 +51,10 @@ I added a semi-transparent box around the tooltip, to improve readability.
 
 ## Resources
 In order to complete this project I used the following resources:
-.) Udacity "Make Effective Data Visualization" course materials and references
-.) D3 JS document references
-.) Tutorial http://bl.ocks.org/mbostock/3883195
-.) Tutorial http://bl.ocks.org/d3noob/4433087
-.) Tutorial http://synthesis.sbecker.net/articles/2012/07/16/learning-d3-part-6-scales-colors
-.) D3 JS definitions for Typescript https://github.com/borisyankov/DefinitelyTyped
-.) W3C SVG documentation:
+* Udacity "Make Effective Data Visualization" course materials and references
+* D3 JS document references
+* Tutorial http://bl.ocks.org/mbostock/3883195
+* Tutorial http://bl.ocks.org/d3noob/4433087
+* Tutorial http://synthesis.sbecker.net/articles/2012/07/16/learning-d3-part-6-scales-colors
+* D3 JS definitions for Typescript https://github.com/borisyankov/DefinitelyTyped
+* W3C SVG documentation:
