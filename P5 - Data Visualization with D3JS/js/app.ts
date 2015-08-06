@@ -31,6 +31,8 @@ class CalorimeterChart {
    public legendTextSize = 50;
    public tooltipVerticalSpacing = 12;
    public tooltipVerticalOffset = 10;
+   public tooltipWidth = 120;
+   //public tooltipHeight = 120;
 
    //                    EarthBlue   white    LoveRed
    public colors: any = ["#0000A0", "white", "#E42217"];
@@ -125,6 +127,45 @@ class CalorimeterChart {
          .append("g")
          .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
+
+      self.drawData(svg, id);
+
+      self.drawAxis(svg);
+
+      self.drawLegend(svg);
+
+      self.drawTooltip(svg, selector);
+
+   }
+
+   private drawAxis(svg: d3.Selection<any>) {
+      // X axis
+      svg.append("g")
+         .attr("class", "x axis")
+         .attr("transform", "translate(0," + this.height + ")")
+         .call(this.xAxis)
+         .append("text")
+         .attr("y", -16)
+         .attr("x", this.width)
+         .attr("dy", ".71em")
+         .style("text-anchor", "end")
+         .text("Time");
+
+      // Y axis
+      svg.append("g")
+         .attr("class", "y axis")
+         .call(this.yAxis)
+         .append("text")
+         .attr("transform", "rotate(-90)")
+         .attr("y", 6)
+         .attr("x", -10)
+         .attr("dy", ".71em")
+         .style("text-anchor", "end")
+         .text("Temperature [C]");
+   }
+
+   private drawData(svg: d3.Selection<any>, id: number) {
+      var self = this;
       // Creates the color gradient
       svg.append("linearGradient")
          .attr("id", "temperature-gradient" + id)
@@ -159,31 +200,10 @@ class CalorimeterChart {
          .attr('stroke-width', 1)
          .attr('stroke-opacity', 0.5)
          .attr('fill', 'none');
+   }
 
-      // X axis
-      svg.append("g")
-         .attr("class", "x axis")
-         .attr("transform", "translate(0," + this.height + ")")
-         .call(this.xAxis)
-         .append("text")
-         .attr("y", -16)
-         .attr("x", this.width)
-         .attr("dy", ".71em")
-         .style("text-anchor", "end")
-         .text("Time");
-
-      // Y axis
-      svg.append("g")
-         .attr("class", "y axis")
-         .call(this.yAxis)
-         .append("text")
-         .attr("transform", "rotate(-90)")
-         .attr("y", 6)
-         .attr("x", -10)
-         .attr("dy", ".71em")
-         .style("text-anchor", "end")
-         .text("Temperature [C]");
-
+   private drawLegend(svg: d3.Selection<any>){
+      var self = this;
       // legend
       var legend = svg.selectAll('.legend')
          .data([this.minThermicPower, 0, this.maxThermicPower].sort().reverse())
@@ -250,12 +270,17 @@ class CalorimeterChart {
          .attr('x', self.legendSpacing + self.legendRectSize)
          .attr('y', self.legendRectSize - self.legendSpacing)
          .text("temp_o");
+   }
+
+   private drawTooltip(svg: d3.Selection<any>, selector: string){
+      var self = this;
 
       // ----
       // Mouse interaction line and tooltip
       var verticalLineGroup = svg
          .append("g")
-         .attr('class', 'verticalLineGroup');
+         .attr('class', 'verticalLineGroup')
+         .style("opacity", 0);
 
       var verticalLine = verticalLineGroup
          .append("line")
@@ -270,60 +295,79 @@ class CalorimeterChart {
          .attr('stroke-width', 0.5);
 
       // Interactive tooltip
-      var tooltip = verticalLineGroup
+      var tooltip = svg
          .append("g")
          .attr("class", "tooltip")
          .attr("fill", "black")
-         .attr("transform", "translate(5," + self.tooltipVerticalOffset + ")");
+         .style("opacity", 0);
+//         .attr("transform", "translate(0," + self.tooltipVerticalOffset + ")");
 
       var tooltipBox = tooltip
          .append('rect')
-         .attr('width', 120)
+         .attr('width', self.tooltipWidth)
          .attr('height', self.tooltipVerticalSpacing * 6)
-         .attr('x', -5)
+         .attr('x', 0)
          .attr('y', -(self.tooltipVerticalSpacing * 1.25))
          .style('fill', 'white')
          .style('stroke', 'gray')
-         .style('opacity', 0)
+         .style('opacity', 0.8)
          .attr('stroke-width', 0.5);
 
       var tooltipTime = tooltip
          .append("text")
          .attr("class", "time")
-         .attr("x", 0)
+         .attr("x", 5)
          .attr("y", self.tooltipVerticalSpacing * 0);
 
       var tooltipPower = tooltip
          .append("text")
          .attr("class", "power")
-         .attr("x", 0)
+         .attr("x", 5)
          .attr("y", self.tooltipVerticalSpacing * 1);
 
       var tooltipTemp_i = tooltip
          .append("text")
          .attr("class", "temp_i")
-         .attr("x", 0)
+         .attr("x", 5)
          .attr("y", self.tooltipVerticalSpacing * 2);
 
       var tooltipTemp_o = tooltip
          .append("text")
          .attr("class", "temp_o")
-         .attr("x", 0)
+         .attr("x", 5)
          .attr("y", self.tooltipVerticalSpacing * 3);
 
       var tooltipFlowrate = tooltip
          .append("text")
          .attr("class", "flowrate")
-         .attr("x", 0)
+         .attr("x", 5)
          .attr("y", self.tooltipVerticalSpacing * 4);
 
       // Mouse move event handler
       d3.select(selector)
          .on("mousemove", function() {
-         var mousex = d3.mouse(this)[0] - self.margin.left;
-         verticalLineGroup.attr('transform', 'translate(' + (mousex) + ',0)');
+         var mousePositionX = d3.mouse(this)[0];
 
-         var time = self.xScale.invert(mousex);
+         var mouseIsOutOfDomain = mousePositionX < self.margin.left || mousePositionX > (self.margin.left + self.width);
+
+         if (mouseIsOutOfDomain) {
+            verticalLineGroup.style("opacity", 0);
+            tooltip.style("opacity", 0);
+            return;
+         }
+         else {
+            verticalLineGroup.style("opacity", 1);
+            tooltip.style("opacity", 0.8);
+         }
+
+         var positionx = mousePositionX - self.margin.left;
+         verticalLineGroup.attr('transform', 'translate(' + (positionx) + ',0)');
+
+         var translateTooltipX = Math.min((self.width - self.tooltipWidth), positionx);
+         tooltip.attr('transform', 'translate(' + translateTooltipX + ',' + self.tooltipVerticalOffset +')')
+
+
+         var time = self.xScale.invert(positionx);
          var calorimeterReading = CalorimeterData.getElementAtDate(self.data, time);
 
          tooltipTime.text("time: " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds());
@@ -333,9 +377,7 @@ class CalorimeterChart {
          tooltipTemp_o.text("temp_o: " + calorimeterReading.temp_o + " C");
          // Transforming m3/s to l/min
          tooltipFlowrate.text("flowrate: " + (calorimeterReading.flowrate * 60000).toFixed(1) + " l/min");
-         tooltipBox.style('opacity', 0.8);
       });
-
    }
 }
 
