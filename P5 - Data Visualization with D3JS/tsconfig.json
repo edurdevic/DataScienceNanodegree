@@ -1,6 +1,10 @@
 {
     "name": "Data visualizations",
     "main": "./app.js",
+    "compilerOptions": {
+       "removeComments": false,
+       "sourceMap": true
+    },
     "typescript": {
         "definition": "awesome.d.ts"
     }
